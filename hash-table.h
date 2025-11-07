@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cstring>
+#include <limits.h> 
+#include <climits>
 
 // Linked List node
 struct node {
@@ -33,6 +35,11 @@ void initializeHashMap(struct hashMap* mp) {
     mp->numOfElements = 0;
     // array of size = 1
     mp->arr = (struct node**)malloc(sizeof(struct node*) * mp->capacity);
+
+    for (int i = 0; i < mp->capacity; i++) {
+        mp->arr[i] = NULL;
+    }
+    
     return;
 }
 
@@ -99,36 +106,34 @@ void deleteKey(struct hashMap* mp, char* key) {
             // Last node or middle node
             else {
                 prevNode->next = currNode->next;
-}
-free(currNode);
-break;
-}
-
-prevNode = currNode;
+        }
+        free(currNode);
+        break;
+        }
+        prevNode = currNode;
         currNode = currNode->next;
     }
-return;
+    return;
 }
 
 char* search(struct hashMap* mp, char* key) {
-// Getting the bucket index for the given key
-int bucketIndex = hashFunction(mp, key);
-// Head of the linked list present at bucket index
-struct node* bucketHead = mp->arr[bucketIndex];
+    // Getting the bucket index for the given key
+    int bucketIndex = hashFunction(mp, key);
+    // Head of the linked list present at bucket index
+    struct node* bucketHead = mp->arr[bucketIndex];
 
-while (bucketHead != NULL) {
-    
-    // Key is found in the hashMap
-    if (strcmp(bucketHead->key, key) == 0) {
-        return bucketHead->value;
+    while (bucketHead != NULL) {
+        
+        // Key is found in the hashMap
+        if (strcmp(bucketHead->key, key) == 0) {
+            return bucketHead->value;
+        }
+        
+        bucketHead = bucketHead->next;
     }
-    
-    bucketHead = bucketHead->next;
-}
 
-// If no key found in the hashMap equal to the given key
-char* errorMssg = (char*)malloc(sizeof(char) * 25);
-strcpy(errorMssg, "Oops! No data found.\n");
-return errorMssg;
+    // If no key found in the hashMap equal to the given key
+    char* errorMssg = (char*)malloc(sizeof(char) * 25);
+    strcpy(errorMssg, "404");
+    return errorMssg;
 }
-
