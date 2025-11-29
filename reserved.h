@@ -19,10 +19,13 @@ void loadReservedWords(struct hashMap* table) {
     s = createSymbol("enquanto",  "reservado", TOKEN_WHILE, 0);
     insertSymbol(table, s);
 
+     s = createSymbol("imprimir",      "reservado", TOKEN_PRINT, 0);
+    insertSymbol(table, s);
+
     s = createSymbol("inteiro",   "tipo", TOKEN_TIPO_INTEIRO, 0);
     insertSymbol(table, s);
 
-    s = createSymbol("bool",      "tipo", TOKEN_TIPO_LOGICO, 0);
+    s = createSymbol("logico",      "tipo", TOKEN_TIPO_LOGICO, 0);
     insertSymbol(table, s);
 
     s = createSymbol("caractere", "tipo", TOKEN_TIPO_CARACTERE, 0);
@@ -32,7 +35,15 @@ void loadReservedWords(struct hashMap* table) {
     storeBoolean(&s, true);
     insertSymbol(table, s);
 
+    s = createSymbol("verdade", "booleano", TOKEN_BOOLEAN, 0);
+    storeBoolean(&s, true);
+    insertSymbol(table, s);
+
     s = createSymbol("falso",      "booleano", TOKEN_BOOLEAN, 0);
+    storeBoolean(&s, false);
+    insertSymbol(table, s);
+
+    s = createSymbol("mentira",      "booleano", TOKEN_BOOLEAN, 0);
     storeBoolean(&s, false);
     insertSymbol(table, s);
 
@@ -96,4 +107,4 @@ void loadReservedWords(struct hashMap* table) {
     insertSymbol(table, s);
 }
 
-#endif
+#endif // RESERVED_H

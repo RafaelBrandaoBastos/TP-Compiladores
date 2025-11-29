@@ -1,0 +1,41 @@
+<TIPO_INTEIRO>  "inteiro"   linha 1
+<ID>  "a"   linha 1
+<ASSIGN>  "<-"   linha 1
+<NUM>  "42"   linha 1
+<SEMICOLON>  ";"   linha 1
+<TIPO_LOGICO>  "logico"   linha 2
+<ID>  "b"   linha 2
+<ASSIGN>  "<-"   linha 2
+<BOOLEAN>  "verdade"   linha 2
+<SEMICOLON>  ";"   linha 2
+<TIPO_LOGICO>  "logico"   linha 3
+<ID>  "d"   linha 3
+<ASSIGN>  "<-"   linha 3
+<BOOLEAN>  "mentira"   linha 3
+<SEMICOLON>  ";"   linha 3
+<TIPO_CARACTERE>  "caractere"   linha 4
+<ID>  "c"   linha 4
+<ASSIGN>  "<-"   linha 4
+<STRING>  "Z"   linha 4
+<SEMICOLON>  ";"   linha 4
+<PRINT>  "imprimir"   linha 5
+<LPAREN>  "("   linha 5
+<STRING>  "a="   linha 5
+<PLUS>  "+"   linha 5
+<ID>  "a"   linha 5
+<PLUS>  "+"   linha 5
+<STRING>  ", b="   linha 5
+<PLUS>  "+"   linha 5
+<ID>  "b"   linha 5
+<PLUS>  "+"   linha 5
+<STRING>  ", d="   linha 5
+<PLUS>  "+"   linha 5
+<ID>  "d"   linha 5
+<PLUS>  "+"   linha 5
+<STRING>  ", c="   linha 5
+<PLUS>  "+"   linha 5
+<ID>  "c"   linha 5
+<RPAREN>  ")"   linha 5
+<SEMICOLON>  ";"   linha 5
+<ID>  "adajiko"   linha 6
+EOF

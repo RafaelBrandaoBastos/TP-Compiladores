@@ -1,4 +1,6 @@
-$$ Teste de loop $$
-enquanto (x < 20) {
-    x <- x + 2;
-}
+Inteiro a <- 42;
+Logico b <- Verdade;
+Logico d <- Mentira;
+Caractere c <- "Z";
+Imprimir("a=" + a + ", b=" + b + ", d=" + d + ", c=" + c);
+jdfngd
