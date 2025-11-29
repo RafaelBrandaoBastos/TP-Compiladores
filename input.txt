@@ -1,0 +1,9 @@
+Inteiro x <- 10, y <- 20;
+
+Enquanto x < y {
+    x <- x + 1;
+}
+
+Se x = y {
+    Imprimir(x);
+}
