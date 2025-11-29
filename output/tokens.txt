@@ -37,5 +37,5 @@
 <ID>  "c"   linha 5
 <RPAREN>  ")"   linha 5
 <SEMICOLON>  ";"   linha 5
-<ID>  "adajiko"   linha 6
+<INVALID>  "@"   linha 6
 EOF
