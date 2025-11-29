@@ -6,10 +6,29 @@
 #include <cstring>  
 #include "reserved.h"
 #include "tokens.h"
+#include "parser.h"
+#include "ast.h"
 #include <vector>
 #include <cctype>          
 
 using namespace std;
+
+// ----------------------
+// Lista global de tokens
+// ----------------------
+vector<Token> TOKEN_STREAM;
+int token_index = 0;
+
+// Fornecido ao parser:
+Token current_token;
+
+// Função usada pelo parser:
+Token next_token() {
+    if (token_index < TOKEN_STREAM.size())
+        return TOKEN_STREAM[token_index++];
+    Token t = {TOKEN_EOF, "", 0};
+    return t;
+}
 
 
 /*
@@ -22,33 +41,6 @@ ANALISADOR LEXICO:
 -Consulta tabela de símbolos somente para saber se é palavra reservada
 -Só produz tokens, não interpreta
 */
-
-
-
-/*
-void lexicalAnalyzer(string line, struct hashMap* SymbolTable) {
-    string token;
-    char* match;
-    for (char c : line) {
-        token += c;
-        match = searchSymbol(SymbolTable, (char*)token.c_str());
-        cout << "Current-Token: " << token << endl;
-        cout << match << endl;
-        std::string mtch = token;
-        if(strcmp(match, "404") != 0) {
-            if(strcmp(match, "for") == 0) {
-
-            } else if(match = "int") {
-
-            } else if(match = "bool") {
-                
-            }
-        }
-    }
-}
-
-*/
-
 
 vector<Token> lexicalAnalyzer(string line, int lineNumber, hashMap* table) {
 
@@ -177,80 +169,68 @@ vector<Token> lexicalAnalyzer(string line, int lineNumber, hashMap* table) {
 
 
 /*
-ANALISADOR SINTÁTICO (PARSER):
-
-- Recebe a lista de tokens gerados pelo léxico
-- Verifica se a sequência de tokens segue as regras da gramática
-- Detecta erros de sintaxe (token inesperado, falta de ';', etc.)
-- Organiza os tokens 
-- Garante que a estrutura do programa é válida
+=========================================================
+           INTEGRAÇÃO COM PARSER + AST
+=========================================================
 */
-
-
-void Parser (){
-
-}
-
-
-
-
-
 
 
 int main()
 {
-
     // 1. Criar e preencher a tabela hash
     struct hashMap SymbolTable;
     initializeHashMap(&SymbolTable);
-    
-    // 2.Carregar palavras-chave (aquela função nova!)
-    loadReservedWords(&SymbolTable);
 
+    // 2. Carregar palavras-chave
+    loadReservedWords(&SymbolTable);
 
     // 3. Abrir arquivo de entrada
     ifstream input("input.txt");
     if (!input.is_open()) {
         cout << "Erro: nao foi possivel abrir input.txt\n";
         return 1;
-    }
-    else{
-        cout << "Arquivo input.txt aberto com sucesso\n";}
-
-    // 4. Cria o arquivo de saída dos tokens
-    ofstream output("tokens.txt");
-    if (!output.is_open()) {
-        cout << "Erro: nao foi possivel criar tokens.txt\n";
-        return 1;
+    } else {
+        cout << "Arquivo input.txt aberto com sucesso\n";
     }
 
-    
-    // 5. Ler linha por linha e transformar em tokens
+    // 4. Ler arquivo e gerar tokens
     string line;
     int lineNumber = 1;
 
     while (getline(input, line)) {
-
         vector<Token> tokens = lexicalAnalyzer(line, lineNumber, &SymbolTable);
 
-        for (const Token& t : tokens) {
-            output << tokenTypeName(t.type)
-                   << "  \"" << t.lexeme << "\""
-                   << "   linha " << t.line << "\n";
-        }
+        // salva no STREAM global
+        for (Token t : tokens)
+            TOKEN_STREAM.push_back(t);
+
         lineNumber++;
     }
 
-    // 6. Token EOF
-    output << "EOF\n";
+    // 5. Token EOF
+    Token eof = {TOKEN_EOF, "", lineNumber};
+    TOKEN_STREAM.push_back(eof);
 
-    
-    // 7. Fecha arquivos
     input.close();
-    output.close();
 
-    cout << "Análise léxica concluída. Tokens salvos em tokens.txt.\n";
+    cout << "Análise léxica concluída. Total de tokens: "
+         << TOKEN_STREAM.size() << "\n";
 
+    // ======================================================
+    //               EXECUTAR PARSER + AST
+    // ======================================================
+
+    cout << "\nIniciando Parser...\n";
+
+    parser_init();        // configura current_token = next_token()
+    AST* root = parse_program();
+
+    cout << "\n\n===== AST GERADA =====\n";
+    print_ast(root);
+
+    free_ast(root);
+
+    cout << "\nParser concluído sem erros!\n";
 
     return 0;
 }
