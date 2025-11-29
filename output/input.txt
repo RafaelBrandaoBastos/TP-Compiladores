@@ -1,0 +1,4 @@
+$$ Teste de loop $$
+enquanto (x < 20) {
+    x <- x + 2;
+}

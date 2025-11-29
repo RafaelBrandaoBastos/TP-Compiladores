@@ -1,139 +1,135 @@
+
+#ifndef SYMBOL_TABLE_H
+#define SYMBOL_TABLE_H
+
 #include <iostream>
 #include <cstring>
 #include <limits.h> 
 #include <climits>
 
+using namespace std;
+
+
+
+// ---------------- SYMBOL INFO --------------------
+
+struct SymbolInfo {
+    char name[64];            // identificador
+    char type[32];            // inteiro, logico, caractere
+    int tokenType;            // ID, NUM, STRING, TIPO_INT...
+    int lineDeclared;
+
+    int sizeInBytes;          // 4 = inteiro, 1 = char, 1 = booleano
+    unsigned char memory[8];  // representação Big-endian
+};
+
+
+// ---------------- HASH MAP --------------------
 // Linked List node
 struct node {
-    // key is string
-    char* key;
-    // value is also string
-    char* value;
-    struct node* next;
+    SymbolInfo info;
+    node* next;
 };
-
-// like constructor
-void setNode(struct node* node, char* key, char* value) {
-    node->key = key;
-    node->value = value;
-    node->next = NULL;
-    return;
-}
 
 struct hashMap {
-    // Current number of elements in hashMap
-    // and capacity of hashMap
-    int numOfElements, capacity;
-    // hold base address array of linked list
-    struct node** arr;
+    int capacity;
+    node** arr;
 };
+
 
 // like constructor
 void initializeHashMap(struct hashMap* mp) {
     // Default capacity in this case
-    mp->capacity = 100;
-    mp->numOfElements = 0;
-    // array of size = 1
-    mp->arr = (struct node**)malloc(sizeof(struct node*) * mp->capacity);
+    mp->capacity = 101;
+    mp->arr = (node**) malloc(sizeof(node*) * mp->capacity);
 
-    for (int i = 0; i < mp->capacity; i++) {
+    for (int i = 0; i < mp->capacity; i++)
         mp->arr[i] = NULL;
-    }
     
     return;
 }
 
-int hashFunction(struct hashMap* mp, char* key) {
-    int bucketIndex;
-    int sum = 0, factor = 31;
-    for (int i = 0; i < strlen(key); i++) {
-        // sum = sum + (ascii value of
-        // char * (primeNumber ^ x))...
-        // where x = 1, 2, 3....n
-        sum = ((sum % mp->capacity) + (((int)key[i]) * factor) % mp->capacity) % mp->capacity;
-        // factor = factor * prime
-        // number....(prime
-        // number) ^ x
-        factor = ((factor % __INT16_MAX__) * (31 % __INT16_MAX__)) % __INT16_MAX__;
+int hashFunction(struct hashMap* mp, const char* key) {
+    long long hash = 0, p = 31;
+    long long pow = 1;
+
+    for (int i = 0; key[i]; i++) {
+        hash = (hash + (tolower(key[i]) - 'a' + 1) * pow) % mp->capacity;
+        pow = (pow * p) % mp->capacity;
     }
-    bucketIndex = sum;
-    return bucketIndex;
+    return hash;
 }
 
-void insert(struct hashMap* mp, char* key, char* value) {
-    // Getting bucket index for the given
-    // key - value pair
-    int bucketIndex = hashFunction(mp, key);
-    struct node* newNode = (struct node*)malloc(
-        // Creating a new node
-        sizeof(struct node));
-    // Setting value of node
-    setNode(newNode, key, value);
-    // Bucket index is empty....no collision
-    if (mp->arr[bucketIndex] == NULL) {
-        mp->arr[bucketIndex] = newNode;
+
+// ---------------- CREATE SYMBOL INFO --------------------
+
+SymbolInfo createSymbol(const char* name, const char* type, int tokenType, int line) {
+    SymbolInfo s;
+
+    strcpy(s.name, name);
+    strcpy(s.type, type);
+    s.tokenType = tokenType;
+    s.lineDeclared = line;
+
+    // Define tamanho e memória em Big-endian
+    if (strcmp(type, "inteiro") == 0) {
+        s.sizeInBytes = 4;
+        s.memory[0] = s.memory[1] = s.memory[2] = s.memory[3] = 0;
     }
-    // Collision
-    else {
-        // Adding newNode at the head of
-        // linked list which is present
-        // at bucket index....insertion at
-        // head in linked list
-        newNode->next = mp->arr[bucketIndex];
-        mp->arr[bucketIndex] = newNode;
+    else if (strcmp(type, "caractere") == 0) {
+        s.sizeInBytes = 1;
+        s.memory[0] = 0;
     }
-    return;
+    else if (strcmp(type, "logico") == 0) {
+        s.sizeInBytes = 1;
+        s.memory[0] = 0;  // 0000 0000 = Mentira
+    }
+
+    return s;
 }
 
-void deleteKey(struct hashMap* mp, char* key) {
-    // Getting bucket index for the
-    // given key
-    int bucketIndex = hashFunction(mp, key);
-    struct node* prevNode = NULL;
-    // Points to the head of
-    // linked list present at
-    // bucket index
-    struct node* currNode = mp->arr[bucketIndex];
-    while (currNode != NULL) {
-        // Key is matched at delete this
-        // node from linked list
-        if (strcmp(key, currNode->key) == 0) {
-            // Head node
-            // deletion
-            if (currNode == mp->arr[bucketIndex]) {
-                mp->arr[bucketIndex] = currNode->next;
-            }
-            // Last node or middle node
-            else {
-                prevNode->next = currNode->next;
-        }
-        free(currNode);
-        break;
-        }
-        prevNode = currNode;
-        currNode = currNode->next;
-    }
-    return;
+
+// ---------------- INSERT --------------------
+
+void insertSymbol(hashMap* mp, SymbolInfo s) {
+    int idx = hashFunction(mp, s.name);
+
+    node* newNode = (node*) malloc(sizeof(node));
+    newNode->info = s;
+    newNode->next = mp->arr[idx];
+    mp->arr[idx] = newNode;
 }
 
-char* search(struct hashMap* mp, char* key) {
-    // Getting the bucket index for the given key
-    int bucketIndex = hashFunction(mp, key);
-    // Head of the linked list present at bucket index
-    struct node* bucketHead = mp->arr[bucketIndex];
+// ---------------- SEARCH --------------------
 
-    while (bucketHead != NULL) {
-        
-        // Key is found in the hashMap
-        if (strcmp(bucketHead->key, key) == 0) {
-            return bucketHead->value;
-        }
-        
-        bucketHead = bucketHead->next;
+SymbolInfo* searchSymbol(hashMap* mp, const char* name) {
+    int idx = hashFunction(mp, name);
+    node* head = mp->arr[idx];
+
+    while (head) {
+        if (strcmp(head->info.name, name) == 0)
+            return &head->info;
+        head = head->next;
     }
 
-    // If no key found in the hashMap equal to the given key
-    char* errorMssg = (char*)malloc(sizeof(char) * 25);
-    strcpy(errorMssg, "404");
-    return errorMssg;
+    return NULL; // not found
 }
+
+// ---------------- VALUE ASSIGNMENT (BIG-ENDIAN) --------------------
+
+void storeInteger(SymbolInfo* s, int value) {
+    s->memory[0] = (value >> 24) & 0xFF;
+    s->memory[1] = (value >> 16) & 0xFF;
+    s->memory[2] = (value >>  8) & 0xFF;
+    s->memory[3] = (value      ) & 0xFF;
+}
+
+void storeChar(SymbolInfo* s, char c) {
+    s->memory[0] = c;  // 1 byte ASCII
+}
+
+void storeBoolean(SymbolInfo* s, bool b) {
+    s->memory[0] = b ? 0xFF : 0x00;  // 1111 1111 ou 0000 0000
+}
+
+#endif
