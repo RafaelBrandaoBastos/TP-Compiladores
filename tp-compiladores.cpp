@@ -2,12 +2,13 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include "hash-table.h"
-#include <cstring>
-#include "reserved.h"
-#include "tokens.h"
 #include <vector>
 #include <cctype>
+#include <cstring>
+#include "hash-table.h"
+#include "reserved.h"
+#include "tokens.h"
+#include "semantic.h"
 
 using namespace std;
 
@@ -168,10 +169,8 @@ vector<Token> lexicalAnalyzer(string line, int lineNumber, hashMap *table)
 - Organiza os tokens
 - Garante que a estrutura do programa é válida
 */
-
 vector<Token> tokens;
 int current = 0;
-
 // ----------------- Funções auxiliares -----------------
 
 Token peek()
@@ -229,7 +228,7 @@ void consume(TokenType type, const string &msg)
         error(msg);
 }
 
-// ---------------- EXPRESSÕES -----------------
+// ---------------- Expressões -----------------
 
 void expression(); // forward
 
@@ -458,6 +457,7 @@ void statement()
 }
 
 //--------------- FUNÇÃO PRINCIPAL DO PARSER -----------------
+
 void Parser(vector<Token> listaTokens)
 {
     tokens = listaTokens;
@@ -467,9 +467,57 @@ void Parser(vector<Token> listaTokens)
     {
         statement();
     }
-
-    cout << "Analise sintatica concluida com sucesso!\n";
 }
+
+//=============== VALIDAÇÕES DO ANALISADOR SEMÂNTICO ===============
+/*
+-----------------------------------------------------------
+(a) TIPOS CORRETOS
+-----------------------------------------------------------
+✔ Soma de inteiro com inteiro → OK
+✘ Soma de inteiro com string → ERRO
+✘ Comparar booleano com inteiro → ERRO
+✘ if("abc") → ERRO (condição deve ser lógica)
+
+-----------------------------------------------------------
+(b) VERIFICAR SE VARIÁVEIS FORAM DECLARADAS
+-----------------------------------------------------------
+✘ x <- 10  sem   inteiro x   → ERRO
+
+-----------------------------------------------------------
+(c) ATRIBUIÇÃO COM TIPO CORRETO
+-----------------------------------------------------------
+✘ Logico a <- 20;     // ERRO
+✔ Caractere c <- "Z"; // OK
+✘ Caractere c <- "ABC"; // ERRO (string > 1 char)
+
+-----------------------------------------------------------
+(d) OPERAÇÕES PERMITIDAS
+-----------------------------------------------------------
+✔ %   permitido somente com inteiros
+✔ **  permitido somente com inteiros
+✔ & e ^ permitidos somente com booleanos
+✔ Comparações geram valores booleanos
+
+-----------------------------------------------------------
+(e) CONTROLE DE ESCOPO
+-----------------------------------------------------------
+✔ Variáveis declaradas dentro de { } são removidas ao sair do bloco
+✔ Para: "para i em (1,10,1)" → 'i' é declarada somente dentro do bloco
+
+-----------------------------------------------------------
+(f) TAMANHO E MEMÓRIA DAS VARIÁVEIS
+-----------------------------------------------------------
+✔ inteiro   → 4 bytes (Big-endian)
+✔ caractere → 1 byte (ASCII)
+✔ logico    → 1 byte (Verdade = 0xFF, Mentira = 0x00)
+
+O analisador semântico deve armazenar os valores corretos
+na struct SymbolInfo, preenchendo:
+
+    s.memory[]  // buffer big-endian
+    s.sizeInBytes
+*/
 
 int main()
 {
@@ -504,9 +552,7 @@ int main()
     // 5. Ler linhas e gerar TODOS os tokens do arquivo
     string line;
     int lineNumber = 1;
-
     vector<Token> ALL_TOKENS; // <-- VETOR ÚNICO PARA O ARQUIVO INTEIRO
-
     while (getline(input, line))
     {
         vector<Token> tokensLine = lexicalAnalyzer(line, lineNumber, &SymbolTable);
@@ -522,6 +568,8 @@ int main()
 
         lineNumber++;
     }
+    input.close();
+    output.close();
     cout << "Análise léxica concluída. Tokens salvos em tokens.txt.\n";
 
     // 6. Token EOF
@@ -536,9 +584,9 @@ int main()
     Parser(ALL_TOKENS);
     cout << "Análise sintática concluída com sucesso!\n";
 
-    // 8. Fecha arquivos
-    input.close();
-    output.close();
+    // 8. Rodar o analisador semântico
+    semanticAnalyzer(ALL_TOKENS, &SymbolTable);
+    cout << "Análise semântica concluída.\n";
 
     return 0;
 }
