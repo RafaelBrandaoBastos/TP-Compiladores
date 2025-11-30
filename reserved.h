@@ -1,31 +1,38 @@
 #ifndef RESERVED_H
 #define RESERVED_H
 
-#include "hash-table.h"   // agora contendo SymbolInfo, insertSymbol, etc
-#include "tokens.h"       // para usar TokenType
+#include "hash-table.h" // agora contendo SymbolInfo, insertSymbol, etc
+#include "tokens.h"     // para usar TokenType
 
 // Função para carregar todas as palavras reservadas
-void loadReservedWords(struct hashMap* table) {
+void loadReservedWords(struct hashMap *table)
+{
 
     // ---------------- PALAVRAS-CHAVE ----------------
     SymbolInfo s;
 
-    s = createSymbol("se",        "reservado", TOKEN_IF, 0);
+    s = createSymbol("se", "reservado", TOKEN_IF, 0);
     insertSymbol(table, s);
 
-    s = createSymbol("senao",     "reservado", TOKEN_ELSE, 0);
+    s = createSymbol("senao", "reservado", TOKEN_ELSE, 0);
     insertSymbol(table, s);
 
-    s = createSymbol("enquanto",  "reservado", TOKEN_WHILE, 0);
+    s = createSymbol("enquanto", "reservado", TOKEN_WHILE, 0);
     insertSymbol(table, s);
 
-     s = createSymbol("imprimir",      "reservado", TOKEN_PRINT, 0);
+    s = createSymbol("imprimir", "reservado", TOKEN_PRINT, 0);
     insertSymbol(table, s);
 
-    s = createSymbol("inteiro",   "tipo", TOKEN_TIPO_INTEIRO, 0);
+    s = createSymbol("para", "reservado", TOKEN_FOR, 0);
     insertSymbol(table, s);
 
-    s = createSymbol("logico",      "tipo", TOKEN_TIPO_LOGICO, 0);
+    s = createSymbol("em", "reservado", TOKEN_EM, 0);
+    insertSymbol(table, s);
+
+    s = createSymbol("inteiro", "tipo", TOKEN_TIPO_INTEIRO, 0);
+    insertSymbol(table, s);
+
+    s = createSymbol("logico", "tipo", TOKEN_TIPO_LOGICO, 0);
     insertSymbol(table, s);
 
     s = createSymbol("caractere", "tipo", TOKEN_TIPO_CARACTERE, 0);
@@ -39,14 +46,13 @@ void loadReservedWords(struct hashMap* table) {
     storeBoolean(&s, true);
     insertSymbol(table, s);
 
-    s = createSymbol("falso",      "booleano", TOKEN_BOOLEAN, 0);
+    s = createSymbol("falso", "booleano", TOKEN_BOOLEAN, 0);
     storeBoolean(&s, false);
     insertSymbol(table, s);
 
-    s = createSymbol("mentira",      "booleano", TOKEN_BOOLEAN, 0);
+    s = createSymbol("mentira", "booleano", TOKEN_BOOLEAN, 0);
     storeBoolean(&s, false);
     insertSymbol(table, s);
-
 
     // ---------------- OPERADORES ARITMÉTICOS ----------------
     s = createSymbol("+", "operador", TOKEN_PLUS, 0);
@@ -60,7 +66,6 @@ void loadReservedWords(struct hashMap* table) {
 
     s = createSymbol("/", "operador", TOKEN_DIV, 0);
     insertSymbol(table, s);
-
 
     // ---------------- COMPARADORES ----------------
     s = createSymbol(">=", "operador", TOKEN_GE, 0);
@@ -81,11 +86,9 @@ void loadReservedWords(struct hashMap* table) {
     s = createSymbol("=", "operador", TOKEN_EQ, 0);
     insertSymbol(table, s);
 
-
     // ---------------- ATRIBUIÇÃO ----------------
     s = createSymbol("<-", "operador", TOKEN_ASSIGN, 0);
     insertSymbol(table, s);
-
 
     // ---------------- DELIMITADORES ----------------
     s = createSymbol("(", "delimitador", TOKEN_LPAREN, 0);

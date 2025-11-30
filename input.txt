@@ -3,4 +3,3 @@ Logico b <- Verdade;
 Logico d <- Mentira;
 Caractere c <- "Z";
 Imprimir("a=" + a + ", b=" + b + ", d=" + d + ", c=" + c);
-@
