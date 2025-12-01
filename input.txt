@@ -1,1 +1,11 @@
-logico x <- 20;
+inteiro x <- 0;
+inteiro y <- x + 2;
+
+se (y > 10)
+{
+    imprimir("maior!");
+}
+senao
+{
+    imprimir("menor ou igual!");
+}

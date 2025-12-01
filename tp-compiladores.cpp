@@ -5,10 +5,16 @@
 #include <vector>
 #include <cctype>
 #include <cstring>
+// Tabela de símbolos
 #include "hash-table.h"
+// Palavras reservadas
 #include "reserved.h"
+// Definição dos tokens
 #include "tokens.h"
+// Analisador semantico
 #include "semantic.h"
+//  Gerador de código
+#include "codegen.h"
 
 using namespace std;
 
@@ -588,5 +594,9 @@ int main()
     semanticAnalyzer(ALL_TOKENS, &SymbolTable);
     cout << "Análise semântica concluída.\n";
 
+    // 9. Gerar código objeto
+    CodeGenerator cg(&SymbolTable);
+    cg.generate(ALL_TOKENS, "out.asm");
+    cout << "Geração de código concluída. Código salvo em out.asm.\n";
     return 0;
 }

@@ -1,5 +1,5 @@
 // ------------------------ semantic.h / semantic.cpp (colocar no mesmo arquivo) ------------------------
-
+// Se tiverem erros no vscode são apenas bugs do Intellisense que não interferem na compilação
 #include <vector>
 #include <string>
 #include <cstdlib>
